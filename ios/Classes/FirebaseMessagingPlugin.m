@@ -137,9 +137,9 @@
 
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
   NSDictionary *localNotification = [NSDictionary dictionaryWithObjectsAndKeys:
-    @notification.fireDate, @"fireDate",
-    @notification.alertBody, @"alertBody",
-    nil]
+    notification.fireDate, @"fireDate",
+    notification.alertBody, @"alertBody",
+    nil];
 
   if (application.applicationState == UIApplicationStateActive) {
     //パターン２：画面が既に表示されていて通知が飛んできた時に勝手に呼ばれる
