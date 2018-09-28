@@ -32,6 +32,8 @@ class FirebaseMessaging {
   MessageHandler _onMessage;
   MessageHandler _onLaunch;
   MessageHandler _onResume;
+  MessageHandler _onStateActive;
+  MessageHandler _onStateInactive;
   String _token;
 
   /// On iOS, prompts the user for notification permissions the first time
@@ -62,10 +64,14 @@ class FirebaseMessaging {
     MessageHandler onMessage,
     MessageHandler onLaunch,
     MessageHandler onResume,
+    MessageHandler onStateActive,
+    MessageHandler onStateInactive,
   }) {
     _onMessage = onMessage;
     _onLaunch = onLaunch;
     _onResume = onResume;
+    _onStateActive = onStateActive;
+    _onStateInactive = onStateInactive;
     _channel.setMethodCallHandler(_handleMethod);
     _channel.invokeMethod('configure');
   }
@@ -115,6 +121,10 @@ class FirebaseMessaging {
         return _onLaunch(call.arguments.cast<String, dynamic>());
       case "onResume":
         return _onResume(call.arguments.cast<String, dynamic>());
+      case "onStateActive":
+        return _onStateActive(call.arguments.cast<String, dynamic>());
+      case "onStateInactive":
+        return _onStateInactive(call.arguments.cast<String, dynamic>());
       default:
         throw UnsupportedError("Unrecognized JSON message");
     }

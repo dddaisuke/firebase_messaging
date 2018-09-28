@@ -135,6 +135,20 @@
   return YES;
 }
 
+- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
+  if (application.applicationState == UIApplicationStateActive) {
+    //パターン２：画面が既に表示されていて通知が飛んできた時に勝手に呼ばれる
+    [_channel invokeMethod:@"onStateActive" arguments:notification];
+    return;
+  }
+
+  if (application.applicationState == UIApplicationStateInactive) {
+    //パターン３：アプリがバックグラウンドでは生きている時に通知をタップ
+    [_channel invokeMethod:@"onStateInactive" arguments:notification];
+    return;
+  }
+}
+
 - (void)application:(UIApplication *)application
     didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
 #ifdef DEBUG
