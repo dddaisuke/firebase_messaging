@@ -136,17 +136,24 @@
 }
 
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
+  NSDictionary *localNotification = [NSDictionary dictionaryWithObjectsAndKeys:
+    @notification.fireDate, @"fireDate",
+    @notification.alertBody, @"alertBody",
+    nil]
+
   if (application.applicationState == UIApplicationStateActive) {
     //パターン２：画面が既に表示されていて通知が飛んできた時に勝手に呼ばれる
-    [_channel invokeMethod:@"onStateActive" arguments:notification];
+    [_channel invokeMethod:@"onStateActive" arguments:localNotification];
     return;
   }
 
   if (application.applicationState == UIApplicationStateInactive) {
     //パターン３：アプリがバックグラウンドでは生きている時に通知をタップ
-    [_channel invokeMethod:@"onStateInactive" arguments:notification];
+    [_channel invokeMethod:@"onStateInactive" arguments:localNotification];
     return;
   }
+
+  [[UIApplication sharedApplication] cancelLocalNotification:notification];
 }
 
 - (void)application:(UIApplication *)application
