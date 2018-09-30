@@ -125,7 +125,7 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent noti
 - (BOOL)application:(UIApplication *)application
     didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   if (launchOptions != nil) {
-      NSLog("aaa");
+      NSLog(@"aaa");
     _launchNotification = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
   }
   return YES;
@@ -164,7 +164,7 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent noti
 
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
 
-    NSLog("zzz");
+    NSLog(@"zzz");
     var alert = UIAlertView();
     alert.title = "Message";
     alert.message = notification.alertBody;
