@@ -23,7 +23,12 @@
                                   binaryMessenger:[registrar messenger]];
   FLTFirebaseMessagingPlugin *instance =
       [[FLTFirebaseMessagingPlugin alloc] initWithChannel:channel];
-  [registrar addApplicationDelegate:instance];
+
+    if(@available(iOS 10.0, *)) {
+        UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+        center.delegate = instance;
+    }
+    [registrar addApplicationDelegate:instance];
   [registrar addMethodCallDelegate:instance channel:channel];
 }
 
@@ -39,6 +44,27 @@
     [FIRMessaging messaging].delegate = self;
   }
   return self;
+}
+
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center
+didReceiveNotificationResponse:(UNNotificationResponse *)response
+         withCompletionHandler:(void (^)())completionHandler {
+    completionHandler();
+}
+
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center
+       willPresentNotification:(UNNotification *)notification
+         withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
+    // アプリがフォアグランドにいた場合の通知動作を指定する。
+    completionHandler(UNNotificationPresentationOptionBadge |
+                      UNNotificationPresentationOptionSound |
+                      UNNotificationPresentationOptionAlert);
+};
+
+// アプリが foreground の時に通知を受け取った時に呼ばれるメソッド
+func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: (UNNotificationPresentationOptions) -> Void) {
+    print("fire! notification ID:\(notification.request.identifier)")
+
 }
 
 - (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
@@ -99,6 +125,7 @@
 - (BOOL)application:(UIApplication *)application
     didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   if (launchOptions != nil) {
+      NSLog("aaa");
     _launchNotification = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
   }
   return YES;
@@ -136,10 +163,20 @@
 }
 
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
+
+    NSLog("zzz");
+    var alert = UIAlertView();
+    alert.title = "Message";
+    alert.message = notification.alertBody;
+    alert.addButtonWithTitle(notification.alertAction);
+    alert.show();
+
+    NSLog(notification.alertBody);
+    NSLog(notification.fireDate);
   NSDictionary *localNotification = [NSDictionary dictionaryWithObjectsAndKeys:
     notification.fireDate, @"fireDate",
     notification.alertBody, @"alertBody",
-    nil];
+                                     nil];
 
   if (application.applicationState == UIApplicationStateActive) {
     //パターン２：画面が既に表示されていて通知が飛んできた時に勝手に呼ばれる
